@@ -32,10 +32,13 @@ class Process():
     def run_pdb2pqr(self, work_dir, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
         args = [exe_path] + pdb2pqr_config["args"] + [pdb_path, pqr_path]
-        proc = subprocess.run(args, cwd=work_dir, capture_output=True)
-        if proc.returncode == 0:
+        try:
+            proc = subprocess.run(args, cwd=work_dir, capture_output=True, check=True)
+            print(proc.stdout.decode("UTF8"))
             return Structure(pqr_path)
-        raise Exception(proc.stderr.decode("UTF8"))
+        except subprocess.CalledProcessError as e:
+            self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
+            print(e.stderr)
 
     def run_apbs(self, work_dir, pqr_struct, pqr_path, map_path):
         ext_min = [None, None, None]
@@ -68,7 +71,10 @@ class Process():
         file.write(apbs_in)
         file.close()
         args = [exe_path, path.join(work_dir, "apbs.in")]
-        proc = subprocess.run(args, cwd=work_dir, capture_output=True)
-        if proc.returncode == 0:
+        try:
+            proc = subprocess.run(args, cwd=work_dir, capture_output=True, check=True)
+            print(proc.stdout.decode("UTF8"))
             return opendx_parser.load_file(map_path + ".dx")
-        raise Exception(proc.stderr.decode("UTF8"))
+        except subprocess.CalledProcessError as e:
+            self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
+            print(e.stderr)
