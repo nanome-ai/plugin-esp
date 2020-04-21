@@ -1,6 +1,0 @@
-__pycache__
-/.vscode
-/build
-/dist
-/docker/.cachebust
-nanome_electrostatic_potential.egg-info
