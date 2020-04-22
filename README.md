@@ -18,7 +18,10 @@ $ python3 -m pip install nanome --upgrade
 
 ### Dependencies
 
-This plugin requires `APBS-PDB2PQR` installed and added to environment variable (or configured in `esp_config.py`)
+This plugin requires `APBS-PDB2PQR` installed and add execution path to one of the following
+1) environment variables `APBS` and `PDB2PQR`
+2) environment variable `PATH`
+3) in `esp_config.py`
 
 Installation instructions for `APBS-PDB2PQR` can be found [here](https://apbs-pdb2pqr.readthedocs.io/)
 
