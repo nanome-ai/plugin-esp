@@ -1,6 +1,5 @@
 import nanome
 from nanome.api.structure import Complex
-from nanome.api.structure import Atom
 from nanome.util import Vector3
 from nanome.util.enums import NotificationTypes
 import os
@@ -8,11 +7,9 @@ from os import path
 import subprocess
 import tempfile
 import math
-from .esp_config import apbs_config
-from .esp_config import pdb2pqr_config
-from . import pqr_parser
+from .esp_config import apbs_config, pdb2pqr_config
+from . import pqr_parser, opendx_parser
 from .pqr_parser import Structure
-from . import opendx_parser
 
 
 class Process():
@@ -67,9 +64,8 @@ class Process():
             pqr_path, fglen[0], fglen[1], fglen[2], cglen[0], cglen[1], cglen[2], dime[0], dime[1], dime[2], map_path)
 
         exe_path = apbs_config["path"]
-        file = open(path.join(work_dir, "apbs.in"), "w+")
-        file.write(apbs_in)
-        file.close()
+        with open(path.join(work_dir, "apbs.in"), "w+") as file:
+            file.write(apbs_in)
         args = [exe_path, path.join(work_dir, "apbs.in")]
         try:
             proc = subprocess.run(args, cwd=work_dir, capture_output=True, check=True)

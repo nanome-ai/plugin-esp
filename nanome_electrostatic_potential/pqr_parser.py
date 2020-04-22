@@ -72,10 +72,10 @@ class Structure():
         return self.__atoms
 
     def read_file(self, path):
-        file = open(path, "r")
-        lines = file.readlines()
-        for line in lines:
-            self.read_line(line)
+        with open(path, "r") as file:
+            lines = file.readlines()
+            for line in lines:
+                self.read_line(line)
 
     def read_line(self, line):
         tokens = line.split()
