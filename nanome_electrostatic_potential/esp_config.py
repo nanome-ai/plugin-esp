@@ -1,7 +1,7 @@
 import os
 
 apbs_config = {
-    "path": os.getenv("APBS", os.path.join(os.getcwd(), "apbs")),
+    "path": os.getenv("APBS", "apbs"),
     "template": """
 read
     mol pqr "{}"
@@ -38,6 +38,6 @@ quit
 }
 
 pdb2pqr_config = {
-    "path": os.getenv("PDB2PQR", os.path.join(os.getcwd(), "pdb2pqr")),
+    "path": os.getenv("PDB2PQR", "pdb2pqr"),
     "args": ["--ff=AMBER", "--chain", "--drop-water"]
 }

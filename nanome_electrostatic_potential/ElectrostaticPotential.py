@@ -1,12 +1,10 @@
 import nanome
 from nanome.util import Logs
-from nanome.util.enums import NotificationTypes
-from nanome.util.enums import VolumeVisualStyle
+from nanome.util.enums import NotificationTypes, VolumeVisualStyle
 from nanome.api.structure import Complex
 from nanome._internal._volumetric._volume_layer import _VolumeLayer
 from nanome._internal._volumetric._volume_properties import _VolumeProperties
-from . import esp_config
-from . import _process
+from . import esp_config, _process
 
 
 class ElectrostaticPotential(nanome.PluginInstance):

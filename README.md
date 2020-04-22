@@ -1,6 +1,6 @@
 # Nanome - Electrostatic Potential
 
-Calculates Electrostatic Potential Map
+A Nanome plugin to calculate electrostatic potential map
 
 ### Preparation
 
@@ -18,9 +18,12 @@ $ python3 -m pip install nanome --upgrade
 
 ### Dependencies
 
-**TODO**: Provide instructions on how to install and link any external dependencies for this plugin.
+This plugin requires `APBS-PDB2PQR` installed and add execution path to one of the following
+1) environment variables `APBS` and `PDB2PQR`
+2) environment variable `PATH`
+3) in `esp_config.py`
 
-**TODO**: Update docker/Dockerfile to install any necessary dependencies.
+Installation instructions for `APBS-PDB2PQR` can be found [here](https://apbs-pdb2pqr.readthedocs.io/)
 
 ### Installation
 
@@ -37,14 +40,6 @@ To start Electrostatic Potential:
 ```sh
 $ nanome-electrostatic-potential -a <plugin_server_address> [optional args]
 ```
-
-#### Optional arguments:
-
-- `-x arg`
-
-  Example argument documentation
-
-**TODO**: Add any optional argument documentation here, or remove section entirely.
 
 ### Docker Usage
 

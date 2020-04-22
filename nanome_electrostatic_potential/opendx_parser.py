@@ -6,10 +6,9 @@ from nanome._internal._volumetric._volume_data import _VolumeData
 
 
 def load_file(path):
-    file = open(path, "r")
-    lines = file.readlines()
-    file.close()
-    return parse_lines([line for line in lines if not line.startswith('#')])
+    with open(path, "r") as file:
+        lines = file.readlines()
+        return parse_lines([line for line in lines if not line.startswith('#')])
 
 
 def parse_lines(lines):
@@ -48,6 +47,3 @@ def parse_lines(lines):
     volume._data = [data[z + (y + x * dim[1]) * dim[2]] for z in range(dim[2])
                     for y in range(dim[1]) for x in range(dim[0])]
     return volume
-
-
-# load_file(r"C:\Users\yzhou\AppData\Local\Temp\tmpryy_hu5e\map.dx")
