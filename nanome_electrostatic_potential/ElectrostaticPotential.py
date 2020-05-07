@@ -16,6 +16,7 @@ class ElectrostaticPotential(nanome.PluginInstance):
         self.on_receive_target_list(request.get_args())
 
     def on_run(self):
+        self.set_plugin_list_button(self.PluginListButtonType.run, "Running...", False)
         self.request_complex_list(self.on_receive_complex_list)
 
     def on_receive_complex_list(self, complex_list):
@@ -33,8 +34,13 @@ class ElectrostaticPotential(nanome.PluginInstance):
     def on_receive_target_list(self, target_list):
         target = target_list[0]
         result = self.__process.run(target)
-        esp_complex = result[0]
-        esp_map = result[1]
+        if result:
+            self.upload_esp(target, result)
+        self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
+
+    def upload_esp(self, target, result):
+        esp_complex, esp_map = result
+        esp_map._name = target.name + '_ESP'
         properties = _VolumeProperties()
         properties._boxed = False
         properties._style = VolumeVisualStyle.SmoothSurface

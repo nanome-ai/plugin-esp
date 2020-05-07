@@ -1,12 +1,11 @@
 #!/bin/bash
-
-if [ -n "$(docker ps -aqf name=nanome-electrostatic-potential)" ]; then
+if [ -n "$(docker ps -aqf name=esp)" ]; then
     echo "removing exited container"
-    docker rm -f nanome-electrostatic-potential
+    docker rm -f esp
 fi
 
 docker run -d \
---name nanome-electrostatic-potential \
+--name esp \
 --restart unless-stopped \
 -e ARGS="$*" \
-nanome-electrostatic-potential
+esp

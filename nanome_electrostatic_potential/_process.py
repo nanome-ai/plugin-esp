@@ -1,6 +1,6 @@
 import nanome
 from nanome.api.structure import Complex
-from nanome.util import Vector3
+from nanome.util import Logs, Vector3
 from nanome.util.enums import NotificationTypes
 import os
 from os import path
@@ -22,20 +22,25 @@ class Process():
             pqr_path = path.join(work_dir, "mol.pqr")
             map_path = path.join(work_dir, "map")
             src_complex.io.to_pdb(pdb_path)
-            pqr_struct = self.run_pdb2pqr(work_dir, pdb_path, pqr_path)
-            volume = self.run_apbs(work_dir, pqr_struct, pqr_path, map_path)
-            return [pqr_parser.structure_to_complex(pqr_struct), volume]
+            try:
+                pqr_struct = self.run_pdb2pqr(work_dir, pdb_path, pqr_path)
+                volume = self.run_apbs(work_dir, pqr_struct, pqr_path, map_path)
+                return [pqr_parser.structure_to_complex(pqr_struct), volume]
+            except Exception as e:
+                Logs.error(e)
+                return None
 
     def run_pdb2pqr(self, work_dir, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
         args = [exe_path] + pdb2pqr_config["args"] + [pdb_path, pqr_path]
         try:
             proc = subprocess.run(args, cwd=work_dir, capture_output=True, check=True)
-            print(proc.stdout.decode("UTF8"))
+            # Logs.message(proc.stdout.decode("UTF8"))
             return Structure(pqr_path)
         except subprocess.CalledProcessError as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
-            print(e.stderr)
+            Logs.error(e.stdout.decode('utf8'))
+            raise RuntimeError('pdb2pqr failed')
 
     def run_apbs(self, work_dir, pqr_struct, pqr_path, map_path):
         ext_min = [None, None, None]
@@ -69,8 +74,9 @@ class Process():
         args = [exe_path, path.join(work_dir, "apbs.in")]
         try:
             proc = subprocess.run(args, cwd=work_dir, capture_output=True, check=True)
-            print(proc.stdout.decode("UTF8"))
+            # Logs.message(proc.stdout.decode("UTF8"))
             return opendx_parser.load_file(map_path + ".dx")
         except subprocess.CalledProcessError as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
-            print(e.stderr)
+            Logs.error(e.stdout.decode("utf8"))
+            raise RuntimeError('apbs failed')
