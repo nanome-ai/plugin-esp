@@ -4,9 +4,8 @@ ENV ARGS=''
 
 WORKDIR /app
 
-COPY apbs-pdb2pqr.tgz .
-RUN tar xf apbs-pdb2pqr.tgz &&\
-  echo "/app/apbs/lib" >> /etc/ld.so.conf.d/local.conf &&\
+ADD apbs-pdb2pqr.tgz .
+RUN echo "/app/apbs/lib" >> /etc/ld.so.conf.d/local.conf &&\
   ln -s /app/pdb2pqr/libreadline.so.6 /app/apbs/lib &&\
   ln -s /app/pdb2pqr/libtinfo.so.5 /app/apbs/lib &&\
   ldconfig
@@ -18,5 +17,6 @@ ARG CACHEBUST
 RUN pip install nanome
 
 COPY . .
+RUN rm apbs-pdb2pqr.tgz
 
 CMD python run.py ${ARGS}
