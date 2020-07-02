@@ -3,4 +3,5 @@ __pycache__
 /build
 /dist
 /docker/.cachebust
-nanome_electrostatic_potential.egg-info
+*.egg-info
+*.log
