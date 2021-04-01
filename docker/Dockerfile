@@ -1,7 +1,6 @@
 FROM nanome/plugin-env
 
 ENV ARGS=''
-
 WORKDIR /app
 
 ADD apbs-pdb2pqr.tgz .
@@ -14,7 +13,8 @@ ENV APBS='/app/apbs/bin/apbs'
 ENV PDB2PQR='/app/pdb2pqr/pdb2pqr'
 
 ARG CACHEBUST
-RUN pip install nanome
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 COPY . .
 RUN rm apbs-pdb2pqr.tgz

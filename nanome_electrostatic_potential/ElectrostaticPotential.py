@@ -60,7 +60,7 @@ def main():
     plugin = nanome.Plugin('Electrostatic Potential',
                            'Calculates Electrostatic Potential Map', 'ESP', False)
     plugin.set_plugin_class(ElectrostaticPotential)
-    plugin.run('127.0.0.1', 8888)
+    plugin.run()
 
 
 if __name__ == '__main__':
