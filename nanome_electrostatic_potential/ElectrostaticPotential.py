@@ -1,10 +1,8 @@
 import nanome
-from nanome.util import Logs
-from nanome.util.enums import NotificationTypes, VolumeVisualStyle
-from nanome.api.structure import Complex
+from nanome.util.enums import Integrations, NotificationTypes, VolumeVisualStyle
 from nanome._internal._volumetric._volume_layer import _VolumeLayer
 from nanome._internal._volumetric._volume_properties import _VolumeProperties
-from . import esp_config, _process
+from . import _process
 
 
 class ElectrostaticPotential(nanome.PluginInstance):
@@ -57,8 +55,7 @@ class ElectrostaticPotential(nanome.PluginInstance):
 
 
 def main():
-    plugin = nanome.Plugin('Electrostatic Potential',
-                           'Calculates Electrostatic Potential Map', 'ESP', False)
+    plugin = nanome.Plugin('Electrostatic Potential', 'Calculates Electrostatic Potential Map', 'ESP', False, integrations=[Integrations.calculate_esp])
     plugin.set_plugin_class(ElectrostaticPotential)
     plugin.run()
 
