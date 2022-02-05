@@ -22,10 +22,12 @@ class ElectrostaticPotential(nanome.PluginInstance):
         if not selected:
             self.send_notification(
                 NotificationTypes.error, "Please select a complex")
+            self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
             return
         if len(selected) > 1:
             self.send_notification(
                 NotificationTypes.error, "Please select only one complex")
+            self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
             return
         self.request_complexes(selected, self.on_receive_target_list)
 
