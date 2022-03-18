@@ -25,7 +25,7 @@ class ESPTestCase(unittest.TestCase):
     """Test different combinations of args for calculate_interactions."""
 
     def setUp(self):
-        tyl_pdb = f'{fixtures_dir}/1tyl.pdb'
+        tyl_pdb = f'{fixtures_dir}/5ceo.pdb'
         self.complex = Complex.io.from_pdb(path=tyl_pdb)
         self.workspace = Workspace()
         for atom in self.complex.atoms:

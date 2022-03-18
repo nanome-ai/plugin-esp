@@ -8,7 +8,7 @@ sys.path.append(minimization_dir)
 test_directory = 'tests'
 suite = unittest.TestLoader().discover(test_directory)
 
-output = unittest.TextTestRunner(verbosity=1).run(suite)
+output = unittest.TextTestRunner(verbosity=0).run(suite)
 
 if output.wasSuccessful():
     sys.exit(0)

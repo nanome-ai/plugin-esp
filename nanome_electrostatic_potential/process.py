@@ -20,7 +20,6 @@ class ESPProcess():
             pdb_path = tempfile.NamedTemporaryFile(suffix=".mol.pdb", dir=work_dir, delete=False).name
             pqr_path = tempfile.NamedTemporaryFile(suffix=".mol.pqr", dir=work_dir, delete=False).name
             map_path = tempfile.NamedTemporaryFile(suffix=".map", dir=work_dir, delete=False).name
-            breakpoint()
             src_complex.io.to_pdb(pdb_path)
             try:
                 pqr_struct = await self.run_pdb2pqr(pdb_path, pqr_path)
@@ -35,10 +34,9 @@ class ESPProcess():
         args = pdb2pqr_config["args"] + [pdb_path, pqr_path]
         proc = Process(exe_path, args)
         proc.on_error = Logs.error
-        proc.on_output = Logs.message
+        proc.on_output = Logs.debug
         try:
             await proc.start()
-            breakpoint()
             return Structure(pqr_path)
         except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
