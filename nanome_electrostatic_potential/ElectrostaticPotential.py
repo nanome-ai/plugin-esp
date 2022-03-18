@@ -1,23 +1,25 @@
 import nanome
+from nanome.util import async_callback
 from nanome.util.enums import Integrations, NotificationTypes, VolumeVisualStyle
 from nanome._internal._volumetric._volume_layer import _VolumeLayer
 from nanome._internal._volumetric._volume_properties import _VolumeProperties
-from . import _process
+from . import process
 
 
-class ElectrostaticPotential(nanome.PluginInstance):
+class ElectrostaticPotential(nanome.AsyncPluginInstance):
+
     def start(self):
-        self.__process = _process.Process(self)
+        self.__process = process.ESPProcess(self)
         self.integration.calculate_esp = self.on_integration_request
 
-    def on_integration_request(self, request):
-        self.on_receive_target_list(request.get_args())
+    @async_callback
+    async def on_integration_request(self, request):
+        await self.on_receive_target_list(request.get_args())
 
-    def on_run(self):
+    @async_callback
+    async def on_run(self):
         self.set_plugin_list_button(self.PluginListButtonType.run, "Running...", False)
-        self.request_complex_list(self.on_receive_complex_list)
-
-    def on_receive_complex_list(self, complex_list):
+        complex_list = await self.request_complex_list()
         selected = [c.index for c in complex_list if c.get_selected()]
         if not selected:
             self.send_notification(
@@ -29,11 +31,12 @@ class ElectrostaticPotential(nanome.PluginInstance):
                 NotificationTypes.error, "Please select only one complex")
             self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
             return
-        self.request_complexes(selected, self.on_receive_target_list)
+        target_list = await self.request_complexes(selected)
+        await self.on_receive_target_list(target_list)
 
-    def on_receive_target_list(self, target_list):
+    async def on_receive_target_list(self, target_list):
         target = target_list[0]
-        result = self.__process.run(target)
+        result = await self.__process.run(target)
         if result:
             self.upload_esp(target, result)
         self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
