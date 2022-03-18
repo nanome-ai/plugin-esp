@@ -3,7 +3,6 @@ from nanome.api.structure import Complex
 from nanome.util import Logs, Process
 from nanome.util.enums import NotificationTypes
 from os import path
-import subprocess
 import tempfile
 import math
 from .esp_config import apbs_config, pdb2pqr_config
@@ -22,14 +21,14 @@ class ESPProcess():
             map_path = path.join(work_dir, "map")
             src_complex.io.to_pdb(pdb_path)
             try:
-                pqr_struct = await self.run_pdb2pqr(work_dir, pdb_path, pqr_path)
+                pqr_struct = await self.run_pdb2pqr(pdb_path, pqr_path)
                 volume = await self.run_apbs(work_dir, pqr_struct, pqr_path, map_path)
                 return [pqr_parser.structure_to_complex(pqr_struct), volume]
             except Exception as e:
                 Logs.error(e)
                 return None
 
-    async def run_pdb2pqr(self, work_dir, pdb_path, pqr_path):
+    async def run_pdb2pqr(self, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
         args = pdb2pqr_config["args"] + [pdb_path, pqr_path]
         p = Process(exe_path, args, True)
@@ -38,9 +37,9 @@ class ESPProcess():
         try:
             await p.start()
             return Structure(pqr_path)
-        except:
+        except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
-            raise RuntimeError('pdb2pqr failed')
+            raise e
 
     async def run_apbs(self, work_dir, pqr_struct, pqr_path, map_path):
         ext_min = [None, None, None]
@@ -80,7 +79,6 @@ class ESPProcess():
 
         try:
             await p.start()
-            # Logs.message(proc.stdout.decode("UTF8"))
             return opendx_parser.load_file(map_path + ".dx")
         except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
