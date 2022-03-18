@@ -42,13 +42,6 @@ class ESPTestCase(unittest.TestCase):
         self.plugin_instance.start()
         self.plugin_instance._network = MagicMock()
 
-        # Select ligand atoms
-        # target_complex = self.complex
-        # chain_name = 'HC'
-        # chain = next(ch for ch in target_complex.chains if ch.name == chain_name)
-        # for atom in chain.atoms:
-        #     atom.selected = True
-
     @patch('nanome.api.plugin_instance.PluginInstance.request_complexes')
     @patch('nanome.api.plugin_instance.PluginInstance.request_complex_list')
     def test_run(self, request_complex_list_mock, request_complexes_mock, *mocks):
