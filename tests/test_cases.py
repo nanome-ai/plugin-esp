@@ -49,7 +49,6 @@ class ESPTestCase(unittest.TestCase):
         # for atom in chain.atoms:
         #     atom.selected = True
 
-
     @patch('nanome.api.plugin_instance.PluginInstance.request_complexes')
     @patch('nanome.api.plugin_instance.PluginInstance.request_complex_list')
     def test_run(self, request_complex_list_mock, request_complexes_mock, *mocks):
