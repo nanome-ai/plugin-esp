@@ -11,14 +11,16 @@ from .pqr_parser import Structure
 
 
 class ESPProcess():
+
     def __init__(self, plugin: nanome.AsyncPluginInstance):
         self.__plugin = plugin
 
     async def run(self, src_complex: Complex):
         with tempfile.TemporaryDirectory() as work_dir:
-            pdb_path = path.join(work_dir, "mol.pdb")
-            pqr_path = path.join(work_dir, "mol.pqr")
-            map_path = path.join(work_dir, "map")
+            pdb_path = tempfile.NamedTemporaryFile(suffix=".mol.pdb", dir=work_dir, delete=False).name
+            pqr_path = tempfile.NamedTemporaryFile(suffix=".mol.pqr", dir=work_dir, delete=False).name
+            map_path = tempfile.NamedTemporaryFile(suffix=".map", dir=work_dir, delete=False).name
+            breakpoint()
             src_complex.io.to_pdb(pdb_path)
             try:
                 pqr_struct = await self.run_pdb2pqr(pdb_path, pqr_path)
@@ -31,11 +33,12 @@ class ESPProcess():
     async def run_pdb2pqr(self, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
         args = pdb2pqr_config["args"] + [pdb_path, pqr_path]
-        p = Process(exe_path, args, True)
-        p.on_error = Logs.error
-        p.on_output = Logs.debug
+        proc = Process(exe_path, args)
+        proc.on_error = Logs.error
+        proc.on_output = Logs.message
         try:
-            await p.start()
+            await proc.start()
+            breakpoint()
             return Structure(pqr_path)
         except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
