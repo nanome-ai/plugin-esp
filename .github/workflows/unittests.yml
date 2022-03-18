@@ -1,13 +1,25 @@
-name: Validate Pull Requests
+name: Unittests
 on:
+  push:
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
-  unittests:
+  ESP-unittests:
+    env:
+      DOCKER_BUILDKIT: 1
+    name: ESP Tests
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
-    - run: pip install -r requirements.txt
-    - run: conda env update -f arpeggio_environ.yml
-    - run: python run_tests.py
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build docker image
+      run: cd docker && ./build.sh
+
+    - name: Run tests
+      run: docker run --rm esp python -m unittest discover tests
