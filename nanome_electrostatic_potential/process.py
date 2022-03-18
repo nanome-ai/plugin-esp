@@ -59,7 +59,7 @@ class ESPProcess():
             if ext_max[2] is None or atom.position.z > ext_max[2]:
                 ext_max[2] = atom.position.z
 
-        ext = [x-y for x, y in zip(ext_max, ext_min)]
+        ext = [x - y for x, y in zip(ext_max, ext_min)]
 
         fglen = [x + 20.0 for x in ext]
         cglen = [max(x for x in fglen) + 20.0] * 3
@@ -77,7 +77,7 @@ class ESPProcess():
         p = Process(exe_path, args, True)
         p.on_error = Logs.error
         p.on_output = Logs.debug
-        
+
         try:
             await p.start()
             # Logs.message(proc.stdout.decode("UTF8"))
