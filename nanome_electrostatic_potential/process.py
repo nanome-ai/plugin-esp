@@ -17,9 +17,9 @@ class ESPProcess():
 
     async def run(self, src_complex: Complex):
         with tempfile.TemporaryDirectory() as work_dir:
-            pdb_path = tempfile.NamedTemporaryFile(suffix=".mol.pdb", dir=work_dir, delete=False).name
-            pqr_path = tempfile.NamedTemporaryFile(suffix=".mol.pqr", dir=work_dir, delete=False).name
-            map_path = tempfile.NamedTemporaryFile(suffix=".map", dir=work_dir, delete=False).name
+            pdb_path = path.join(work_dir, "mol.pdb")
+            pqr_path = path.join(work_dir, "mol.pqr")
+            map_path = path.join(work_dir, "map")
             src_complex.io.to_pdb(pdb_path)
             try:
                 pqr_struct = await self.run_pdb2pqr(pdb_path, pqr_path)
