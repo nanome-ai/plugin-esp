@@ -1,10 +1,8 @@
 import nanome
 from nanome.api.structure import Complex
-from nanome.util import Logs, Vector3
+from nanome.util import Logs, Process
 from nanome.util.enums import NotificationTypes
-import os
 from os import path
-import subprocess
 import tempfile
 import math
 from .esp_config import apbs_config, pdb2pqr_config
@@ -12,37 +10,39 @@ from . import pqr_parser, opendx_parser
 from .pqr_parser import Structure
 
 
-class Process():
-    def __init__(self, plugin: nanome.PluginInstance):
+class ESPProcess():
+
+    def __init__(self, plugin: nanome.AsyncPluginInstance):
         self.__plugin = plugin
 
-    def run(self, src_complex: Complex):
+    async def run(self, src_complex: Complex):
         with tempfile.TemporaryDirectory() as work_dir:
             pdb_path = path.join(work_dir, "mol.pdb")
             pqr_path = path.join(work_dir, "mol.pqr")
             map_path = path.join(work_dir, "map")
             src_complex.io.to_pdb(pdb_path)
             try:
-                pqr_struct = self.run_pdb2pqr(work_dir, pdb_path, pqr_path)
-                volume = self.run_apbs(work_dir, pqr_struct, pqr_path, map_path)
+                pqr_struct = await self.run_pdb2pqr(pdb_path, pqr_path)
+                volume = await self.run_apbs(work_dir, pqr_struct, pqr_path, map_path)
                 return [pqr_parser.structure_to_complex(pqr_struct), volume]
             except Exception as e:
                 Logs.error(e)
                 return None
 
-    def run_pdb2pqr(self, work_dir, pdb_path, pqr_path):
+    async def run_pdb2pqr(self, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
-        args = [exe_path] + pdb2pqr_config["args"] + [pdb_path, pqr_path]
+        args = pdb2pqr_config["args"] + [pdb_path, pqr_path]
+        proc = Process(exe_path, args)
+        proc.on_error = Logs.error
+        proc.on_output = Logs.debug
         try:
-            proc = subprocess.run(args, cwd=work_dir, capture_output=True, check=True)
-            # Logs.message(proc.stdout.decode("UTF8"))
+            await proc.start()
             return Structure(pqr_path)
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
-            Logs.error(e.stdout.decode('utf8'))
-            raise RuntimeError('pdb2pqr failed')
+            raise e
 
-    def run_apbs(self, work_dir, pqr_struct, pqr_path, map_path):
+    async def run_apbs(self, work_dir, pqr_struct, pqr_path, map_path):
         ext_min = [None, None, None]
         ext_max = [None, None, None]
         for atom in pqr_struct.atoms:
@@ -59,24 +59,28 @@ class Process():
             if ext_max[2] is None or atom.position.z > ext_max[2]:
                 ext_max[2] = atom.position.z
 
-        ext = [x-y for x, y in zip(ext_max, ext_min)]
+        ext = [x - y for x, y in zip(ext_max, ext_min)]
 
         fglen = [x + 20.0 for x in ext]
         cglen = [max(x for x in fglen) + 20.0] * 3
         dime = [math.ceil(x * 2) for x in fglen]
 
         apbs_in = apbs_config["template"].format(
-            pqr_path, fglen[0], fglen[1], fglen[2], cglen[0], cglen[1], cglen[2], dime[0], dime[1], dime[2], map_path)
+            pqr_path, fglen[0], fglen[1], fglen[2], cglen[0], cglen[1],
+            cglen[2], dime[0], dime[1], dime[2], map_path)
 
         exe_path = apbs_config["path"]
         with open(path.join(work_dir, "apbs.in"), "w+") as file:
             file.write(apbs_in)
-        args = [exe_path, path.join(work_dir, "apbs.in")]
+
+        args = [path.join(work_dir, "apbs.in")]
+        p = Process(exe_path, args, True)
+        p.on_error = Logs.error
+        p.on_output = Logs.debug
+
         try:
-            proc = subprocess.run(args, cwd=work_dir, capture_output=True, check=True)
-            # Logs.message(proc.stdout.decode("UTF8"))
+            await p.start()
             return opendx_parser.load_file(map_path + ".dx")
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
-            Logs.error(e.stdout.decode("utf8"))
-            raise RuntimeError('apbs failed')
+            raise e

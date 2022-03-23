@@ -1,0 +1,25 @@
+name: Unittests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  ESP-unittests:
+    env:
+      DOCKER_BUILDKIT: 1
+    name: ESP Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build docker image
+      run: cd docker && ./build.sh
+
+    - name: Run tests
+      run: docker run --rm esp python -m unittest discover tests
