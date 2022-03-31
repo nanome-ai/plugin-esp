@@ -1,2 +1,7 @@
 .git
 **/__pycache__
+*
+!plugin
+!apbs-pdb2pqr.tgz
+!requirements.txt
+!run.py

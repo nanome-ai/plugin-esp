@@ -7,7 +7,7 @@ from random import randint
 from unittest.mock import MagicMock
 from nanome.api.structure import Chain, Complex, Molecule, Workspace
 from nanome.util.stream import StreamCreationError
-from nanome_electrostatic_potential.ElectrostaticPotential import ElectrostaticPotential
+from plugin.ElectrostaticPotential import ElectrostaticPotential
 
 
 fixtures_dir = os.path.join(os.path.dirname(__file__), 'fixtures')
