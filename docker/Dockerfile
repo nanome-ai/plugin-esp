@@ -14,9 +14,6 @@ ENV PDB2PQR='/app/pdb2pqr/pdb2pqr'
 
 ARG CACHEBUST
 COPY requirements.txt .
-COPY tests .
-COPY run_tests.py .
-
 RUN pip install -r requirements.txt
 
 COPY . .
