@@ -33,7 +33,7 @@ class ESPProcess():
         exe_path = pdb2pqr_config["path"]
         args = pdb2pqr_config["args"] + [pdb_path, pqr_path]
         proc = Process(exe_path, args)
-        proc.on_error = Logs.error
+        proc.on_error = Logs.warning
         proc.on_output = Logs.debug
         try:
             await proc.start()
@@ -75,7 +75,7 @@ class ESPProcess():
 
         args = [path.join(work_dir, "apbs.in")]
         p = Process(exe_path, args, True)
-        p.on_error = Logs.error
+        p.on_error = Logs.warning
         p.on_output = Logs.debug
 
         try:
