@@ -5,3 +5,5 @@
 !apbs-pdb2pqr.tgz
 !requirements.txt
 !run.py
+!run_tests.py
+!tests
