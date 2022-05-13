@@ -15,8 +15,8 @@ class Atom():
             self.__chain_id = None
 
         # Strip non numeric characters from the residue number
-        stripped_res_number = re.sub("[^0-9]", "", tokens[-6])
-        self.__res_number = int(stripped_res_number)
+        res_number = re.sub("[^0-9]", "", tokens[-6])
+        self.__res_number = int(res_number)
         self.__position = Vector3(tokens[-5], tokens[-4], tokens[-3])
         self.__charge = float(tokens[-2])
         self.__radius = float(tokens[-1])
