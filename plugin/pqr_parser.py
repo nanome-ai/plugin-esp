@@ -1,5 +1,4 @@
-import nanome
-import string
+import re
 from nanome.util import Vector3
 from nanome._internal._structure import _Complex, _Molecule, _Chain, _Residue, _Atom
 
@@ -14,7 +13,10 @@ class Atom():
             self.__chain_id = tokens[4]
         else:
             self.__chain_id = None
-        self.__res_number = int(tokens[-6])
+
+        # Strip non numeric characters from the residue number
+        stripped_res_number = re.sub("[^0-9]", "", tokens[-6])
+        self.__res_number = int(stripped_res_number)
         self.__position = Vector3(tokens[-5], tokens[-4], tokens[-3])
         self.__charge = float(tokens[-2])
         self.__radius = float(tokens[-1])
