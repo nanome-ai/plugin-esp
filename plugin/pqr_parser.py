@@ -1,6 +1,5 @@
 import re
-from nanome.util import Vector3
-from nanome._internal._structure import _Complex, _Molecule, _Chain, _Residue, _Atom
+from nanome.util import Logs, Vector3
 
 
 class Atom():
@@ -20,7 +19,9 @@ class Atom():
         try:
             self.__res_number = int(res_number)
         except ValueError:
-            self.__res_number = -1
+            default_res_number = -1
+            Logs.warning(f"Invalid residue number: {res_number}, defaulting to {default_res_number}")
+            self.__res_number = default_res_number
         self.__position = Vector3(tokens[-5], tokens[-4], tokens[-3])
         self.__charge = float(tokens[-2])
         self.__radius = float(tokens[-1])
@@ -68,7 +69,8 @@ class Atom():
         return self.__radius
 
 
-class Structure():
+class PQRStructure():
+
     def __init__(self, path):
         self.__atoms = []
         self.read_file(path)
@@ -92,43 +94,3 @@ class Structure():
 
     def read_coord(self, tokens):
         self.__atoms.append(Atom(tokens))
-
-
-def structure_to_complex(structure: Structure):
-    residues = {}
-    chains = {}
-    for pqr_atom in structure.atoms:
-        atom = _Atom._create()
-        atom._symbol = pqr_atom.atom_name[:1]
-        atom._serial = pqr_atom.atom_number
-        atom._name = pqr_atom.atom_name
-        atom._position = pqr_atom.position
-        atom._is_het = pqr_atom.is_het
-
-        if not pqr_atom.chain_id in chains:
-            chain = _Chain._create()
-            chain._name = pqr_atom.chain_id
-            chains[pqr_atom.chain_id] = chain
-
-        if not pqr_atom.residue_number in residues:
-            residue = _Residue._create()
-            residue._name = pqr_atom.residue_name
-            residue._type = pqr_atom.residue_name
-            residue._serial = pqr_atom.residue_number
-            residues[pqr_atom.residue_number] = residue
-            chains[pqr_atom.chain_id]._add_residue(residue)
-
-        residues[pqr_atom.residue_number]._add_atom(atom)
-
-    mol = _Molecule._create()
-    for chain in chains:
-        mol._add_chain(chains[chain])
-
-    complex = _Complex._create()
-    complex._add_molecule(mol)
-    return complex._convert_to_conformers()
-
-
-def load_pqr(path):
-    structure = Structure(path)
-    structure_to_complex(structure)

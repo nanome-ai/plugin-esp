@@ -6,8 +6,8 @@ from os import path
 import tempfile
 import math
 from .esp_config import apbs_config, pdb2pqr_config
-from . import pqr_parser, opendx_parser
-from .pqr_parser import Structure
+from . import opendx_parser
+from .pqr_parser import PQRStructure
 
 
 class ESPProcess():
@@ -22,9 +22,10 @@ class ESPProcess():
             map_path = path.join(work_dir, "map")
             src_complex.io.to_pdb(pdb_path)
             try:
-                pqr_struct = await self.run_pdb2pqr(pdb_path, pqr_path)
-                volume = await self.run_apbs(work_dir, pqr_struct, pqr_path, map_path)
-                return [pqr_parser.structure_to_complex(pqr_struct), volume]
+                await self.run_pdb2pqr(pdb_path, pqr_path)
+                volume = await self.run_apbs(work_dir, pqr_path, map_path)
+                comp = Complex.io.from_pdb(path=pdb_path)
+                return [comp, volume]
             except Exception as e:
                 Logs.error(e)
                 return None
@@ -37,14 +38,14 @@ class ESPProcess():
         proc.on_output = Logs.debug
         try:
             await proc.start()
-            return Structure(pqr_path)
         except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
             raise e
 
-    async def run_apbs(self, work_dir, pqr_struct, pqr_path, map_path):
+    async def run_apbs(self, work_dir, pqr_path, map_path):
         ext_min = [None, None, None]
         ext_max = [None, None, None]
+        pqr_struct = PQRStructure(pqr_path)
         for atom in pqr_struct.atoms:
             if ext_min[0] is None or atom.position.x < ext_min[0]:
                 ext_min[0] = atom.position.x
