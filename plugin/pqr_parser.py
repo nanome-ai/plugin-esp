@@ -4,6 +4,7 @@ from nanome._internal._structure import _Complex, _Molecule, _Chain, _Residue, _
 
 
 class Atom():
+
     def __init__(self, tokens):
         self.__is_het = tokens[0] != "ATOM"
         self.__atom_number = int(tokens[1])
@@ -16,7 +17,10 @@ class Atom():
 
         # Strip non numeric characters from the residue number
         res_number = re.sub("[^0-9]", "", tokens[-6])
-        self.__res_number = int(res_number)
+        try:
+            self.__res_number = int(res_number)
+        except ValueError:
+            self.__res_number = -1
         self.__position = Vector3(tokens[-5], tokens[-4], tokens[-3])
         self.__charge = float(tokens[-2])
         self.__radius = float(tokens[-1])
