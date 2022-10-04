@@ -31,6 +31,7 @@ component "connections" value 2
 component "data" value 3
 """
 
+
 def load_file(path):
     with open(path, "r") as file:
         lines = file.readlines()
@@ -82,8 +83,8 @@ def parse_lines(lines):
 
     volume._data = [
         data[z + (y + x * dim[1]) * dim[2]]
-            for z in range(dim[2])
-            for y in range(dim[1])
-            for x in range(dim[0])
+        for z in range(dim[2])
+        for y in range(dim[1])
+        for x in range(dim[0])
     ]
     return volume
