@@ -57,7 +57,7 @@ class ESPProcess():
 
         # Fine grid lengths (fglen): [xlen][ylen][zlen]
         # dimensions in angstroms of the fine grid along the molecule X, Y, and Z axes;
-        # the fine grid should enclose the region of interest in the molecule 
+        # the fine grid should enclose the region of interest in the molecule
         fglen = [x + 20.0 for x in ext]
 
         # Coarse grid lengths (cglen): [xlen][ylen][zlen]
@@ -68,7 +68,7 @@ class ESPProcess():
         # Grid dimensions (dime): [nx][ny][nz]
         # grid points per processor;
         # dimensions in integer grid units along the molecule X, Y, and Z axes;
-        # commonly used values are 65, 97, 129, and 161 
+        # commonly used values are 65, 97, 129, and 161
         dime = [math.ceil(x * 2) for x in fglen]
 
         apbs_in = apbs_config["template"].format(
