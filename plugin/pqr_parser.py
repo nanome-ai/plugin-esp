@@ -1,5 +1,4 @@
-import re
-from nanome.util import Logs, Vector3
+from nanome.util import Vector3
 
 
 class Atom():
@@ -28,6 +27,6 @@ class PQRStructure():
             for line in lines:
                 tokens = line.split()
                 if tokens[0] == "REMARK":
-                    return
+                    continue
                 elif tokens[0] == "ATOM" or tokens[0] == "HETATOM":
                     self.atoms.append(Atom(tokens))
