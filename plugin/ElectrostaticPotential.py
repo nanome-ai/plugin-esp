@@ -46,7 +46,7 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
         esp_map._name = comp.name + '_ESP'
         properties = _VolumeProperties()
         properties._boxed = False
-        properties._style = VolumeVisualStyle.Mesh
+        properties._style = VolumeVisualStyle.SmoothSurface
         properties._use_map_mover = False
         properties._visible = False
         layer0 = _VolumeLayer()
