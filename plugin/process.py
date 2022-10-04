@@ -71,6 +71,7 @@ class ESPProcess():
         # commonly used values are 65, 97, 129, and 161
         dime = [math.ceil(x * 2) for x in fglen]
 
+        # Insert calculated values into config template
         apbs_in = apbs_config["template"].format(
             pqr_path, fglen[0], fglen[1], fglen[2], cglen[0], cglen[1],
             cglen[2], dime[0], dime[1], dime[2], map_path)
