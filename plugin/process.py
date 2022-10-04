@@ -43,27 +43,31 @@ class ESPProcess():
             raise e
 
     async def run_apbs(self, work_dir, pqr_path, map_path):
-        ext_min = [None, None, None]
-        ext_max = [None, None, None]
         pqr_struct = PQRStructure(pqr_path)
-        for atom in pqr_struct.atoms:
-            if ext_min[0] is None or atom.position.x < ext_min[0]:
-                ext_min[0] = atom.position.x
-            if ext_max[0] is None or atom.position.x > ext_max[0]:
-                ext_max[0] = atom.position.x
-            if ext_min[1] is None or atom.position.y < ext_min[1]:
-                ext_min[1] = atom.position.y
-            if ext_max[1] is None or atom.position.y > ext_max[1]:
-                ext_max[1] = atom.position.y
-            if ext_min[2] is None or atom.position.z < ext_min[2]:
-                ext_min[2] = atom.position.z
-            if ext_max[2] is None or atom.position.z > ext_max[2]:
-                ext_max[2] = atom.position.z
-
+        ext_min_x = min(atom.position.x for atom in pqr_struct.atoms)
+        ext_min_y = min(atom.position.y for atom in pqr_struct.atoms)
+        ext_min_z = min(atom.position.z for atom in pqr_struct.atoms)
+        ext_max_x = max(atom.position.x for atom in pqr_struct.atoms)
+        ext_max_y = max(atom.position.y for atom in pqr_struct.atoms)
+        ext_max_z = max(atom.position.z for atom in pqr_struct.atoms)
+        ext_min = [ext_min_x, ext_min_y, ext_min_z]
+        ext_max = [ext_max_x, ext_max_y, ext_max_z]
         ext = [x - y for x, y in zip(ext_max, ext_min)]
 
+        # Fine grid lengths (fglen): [xlen][ylen][zlen]
+        # dimensions in angstroms of the fine grid along the molecule X, Y, and Z axes;
+        # the fine grid should enclose the region of interest in the molecule 
         fglen = [x + 20.0 for x in ext]
+
+        # Coarse grid lengths (cglen): [xlen][ylen][zlen]
+        # dimensions in angstroms of the coarse grid along the molecule X, Y, and Z axes;
+        # the coarse grid should completely enclose the biomolecule
         cglen = [max(x for x in fglen) + 20.0] * 3
+
+        # Grid dimensions (dime): [nx][ny][nz]
+        # grid points per processor;
+        # dimensions in integer grid units along the molecule X, Y, and Z axes;
+        # commonly used values are 65, 97, 129, and 161 
         dime = [math.ceil(x * 2) for x in fglen]
 
         apbs_in = apbs_config["template"].format(
