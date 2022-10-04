@@ -24,6 +24,7 @@ class ESPProcess():
             try:
                 await self.run_pdb2pqr(pdb_path, pqr_path)
                 volume = await self.run_apbs(work_dir, pqr_path, map_path)
+                # Create new copy of the Complex to avoid modifying the original
                 comp = Complex.io.from_pdb(path=pdb_path)
                 return [comp, volume]
             except Exception as e:
