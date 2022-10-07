@@ -34,7 +34,7 @@ class ESPProcess():
     async def run_pdb2pqr(self, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
         args = pdb2pqr_config["args"] + [pdb_path, pqr_path]
-        proc = Process(exe_path, args)
+        proc = Process(exe_path, args, buffer_lines=False)
         proc.on_error = Logs.warning
         proc.on_output = Logs.debug
         try:
