@@ -45,20 +45,12 @@ class ESPProcess():
 
     async def run_apbs(self, work_dir, pqr_path, map_path):
         pqr_struct = PQRStructure(pqr_path)
-        ext_min_x = min(atom.position.x for atom in pqr_struct.atoms)
-        ext_min_y = min(atom.position.y for atom in pqr_struct.atoms)
-        ext_min_z = min(atom.position.z for atom in pqr_struct.atoms)
-        ext_max_x = max(atom.position.x for atom in pqr_struct.atoms)
-        ext_max_y = max(atom.position.y for atom in pqr_struct.atoms)
-        ext_max_z = max(atom.position.z for atom in pqr_struct.atoms)
-        ext_min = [ext_min_x, ext_min_y, ext_min_z]
-        ext_max = [ext_max_x, ext_max_y, ext_max_z]
-        ext = [x - y for x, y in zip(ext_max, ext_min)]
+        box_dimensions = pqr_struct.box_dimensions
 
         # Fine grid lengths (fglen): [xlen][ylen][zlen]
         # dimensions in angstroms of the fine grid along the molecule X, Y, and Z axes;
         # the fine grid should enclose the region of interest in the molecule
-        fglen = [x + 20.0 for x in ext]
+        fglen = [x + 20.0 for x in box_dimensions]
 
         # Coarse grid lengths (cglen): [xlen][ylen][zlen]
         # dimensions in angstroms of the coarse grid along the molecule X, Y, and Z axes;
