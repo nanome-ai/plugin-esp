@@ -1,5 +1,6 @@
 from nanome.util import Vector3
 
+
 class PQRStructure():
 
     def __init__(self, path):
@@ -30,4 +31,3 @@ class PQRStructure():
         ext_max = [ext_max_x, ext_max_y, ext_max_z]
         ext = [y - x for x, y in zip(ext_min, ext_max)]
         return ext
-    
