@@ -14,7 +14,7 @@ class PQRStructure():
                 tokens = line.split()
                 if tokens[0] == "REMARK":
                     continue
-                elif tokens[0] == "ATOM" or tokens[0] == "HETATOM":
+                elif tokens[0] in ("ATOM", "HETATOM"):
                     atom_position = Vector3(tokens[-5], tokens[-4], tokens[-3])
                     self.atom_positions.append(atom_position)
 

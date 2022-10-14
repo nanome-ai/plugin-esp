@@ -26,10 +26,21 @@ class ESPProcess():
                 volume = await self.run_apbs(work_dir, pqr_path, map_path)
                 # Create new copy of the Complex to avoid modifying the original
                 comp = Complex.io.from_pdb(path=pdb_path)
+                self._remove_ligands(comp)
                 return [comp, volume]
             except Exception as e:
                 Logs.error(e)
                 return None
+
+    def _remove_ligands(self, comp):
+        """Remove ligands from complex linked to ESP surface.
+        
+        The user wants to see the surface of the protein, not the ligand.
+        """
+        for chain in comp.chains:
+            for residue in chain.residues:
+                if any([atom.is_het for atom in residue.atoms]):
+                    chain.remove_residue(residue)
 
     async def run_pdb2pqr(self, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
