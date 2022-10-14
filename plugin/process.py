@@ -6,8 +6,8 @@ from os import path
 import tempfile
 import math
 from .esp_config import apbs_config, pdb2pqr_config
-from . import pqr_parser, opendx_parser
-from .pqr_parser import Structure
+from . import opendx_parser
+from .pqr_parser import PQRStructure
 
 
 class ESPProcess():
@@ -22,9 +22,12 @@ class ESPProcess():
             map_path = path.join(work_dir, "map")
             src_complex.io.to_pdb(pdb_path)
             try:
-                pqr_struct = await self.run_pdb2pqr(pdb_path, pqr_path)
-                volume = await self.run_apbs(work_dir, pqr_struct, pqr_path, map_path)
-                return [pqr_parser.structure_to_complex(pqr_struct), volume]
+                await self.run_pdb2pqr(pdb_path, pqr_path)
+                volume = await self.run_apbs(work_dir, pqr_path, map_path)
+                # Create new copy of the Complex to avoid modifying the original
+                comp = Complex.io.from_pdb(path=pdb_path)
+                self._remove_ligands(comp)
+                return [comp, volume]
             except Exception as e:
                 Logs.error(e)
                 return None
@@ -32,39 +35,36 @@ class ESPProcess():
     async def run_pdb2pqr(self, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
         args = pdb2pqr_config["args"] + [pdb_path, pqr_path]
-        proc = Process(exe_path, args)
+        proc = Process(exe_path, args, buffer_lines=False)
         proc.on_error = Logs.warning
         proc.on_output = Logs.debug
         try:
             await proc.start()
-            return Structure(pqr_path)
         except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
             raise e
 
-    async def run_apbs(self, work_dir, pqr_struct, pqr_path, map_path):
-        ext_min = [None, None, None]
-        ext_max = [None, None, None]
-        for atom in pqr_struct.atoms:
-            if ext_min[0] is None or atom.position.x < ext_min[0]:
-                ext_min[0] = atom.position.x
-            if ext_max[0] is None or atom.position.x > ext_max[0]:
-                ext_max[0] = atom.position.x
-            if ext_min[1] is None or atom.position.y < ext_min[1]:
-                ext_min[1] = atom.position.y
-            if ext_max[1] is None or atom.position.y > ext_max[1]:
-                ext_max[1] = atom.position.y
-            if ext_min[2] is None or atom.position.z < ext_min[2]:
-                ext_min[2] = atom.position.z
-            if ext_max[2] is None or atom.position.z > ext_max[2]:
-                ext_max[2] = atom.position.z
+    async def run_apbs(self, work_dir, pqr_path, map_path):
+        pqr_struct = PQRStructure(pqr_path)
+        box_dimensions = pqr_struct.box_dimensions
 
-        ext = [x - y for x, y in zip(ext_max, ext_min)]
+        # Fine grid lengths (fglen): [xlen][ylen][zlen]
+        # dimensions in angstroms of the fine grid along the molecule X, Y, and Z axes;
+        # the fine grid should enclose the region of interest in the molecule
+        fglen = [x + 20.0 for x in box_dimensions]
 
-        fglen = [x + 20.0 for x in ext]
+        # Coarse grid lengths (cglen): [xlen][ylen][zlen]
+        # dimensions in angstroms of the coarse grid along the molecule X, Y, and Z axes;
+        # the coarse grid should completely enclose the biomolecule
         cglen = [max(x for x in fglen) + 20.0] * 3
+
+        # Grid dimensions (dime): [nx][ny][nz]
+        # grid points per processor;
+        # dimensions in integer grid units along the molecule X, Y, and Z axes;
+        # commonly used values are 65, 97, 129, and 161
         dime = [math.ceil(x * 2) for x in fglen]
 
+        # Insert calculated values into config template
         apbs_in = apbs_config["template"].format(
             pqr_path, fglen[0], fglen[1], fglen[2], cglen[0], cglen[1],
             cglen[2], dime[0], dime[1], dime[2], map_path)
@@ -84,3 +84,14 @@ class ESPProcess():
         except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
             raise e
+
+    @staticmethod
+    def _remove_ligands(comp):
+        """Remove ligands from complex linked to ESP surface.
+
+        The user wants to see the surface of the protein, not the ligand.
+        """
+        for chain in comp.chains:
+            for residue in chain.residues:
+                if any([atom.is_het for atom in residue.atoms]):
+                    chain.remove_residue(residue)
