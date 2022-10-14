@@ -32,16 +32,6 @@ class ESPProcess():
                 Logs.error(e)
                 return None
 
-    def _remove_ligands(self, comp):
-        """Remove ligands from complex linked to ESP surface.
-        
-        The user wants to see the surface of the protein, not the ligand.
-        """
-        for chain in comp.chains:
-            for residue in chain.residues:
-                if any([atom.is_het for atom in residue.atoms]):
-                    chain.remove_residue(residue)
-
     async def run_pdb2pqr(self, pdb_path, pqr_path):
         exe_path = pdb2pqr_config["path"]
         args = pdb2pqr_config["args"] + [pdb_path, pqr_path]
@@ -94,3 +84,15 @@ class ESPProcess():
         except Exception as e:
             self.__plugin.send_notification(NotificationTypes.error, "plugin ran into an error")
             raise e
+    
+    @staticmethod
+    def _remove_ligands(comp):
+        """Remove ligands from complex linked to ESP surface.
+        
+        The user wants to see the surface of the protein, not the ligand.
+        """
+        for chain in comp.chains:
+            for residue in chain.residues:
+                if any([atom.is_het for atom in residue.atoms]):
+                    chain.remove_residue(residue)
+
