@@ -35,7 +35,7 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
             if not self.validate_comp_is_protein(selected_comps):
                 error_msg = 'Selected complex must contain a protein'
                 valid_selection = False
-        
+
         if not valid_selection:
             self.send_notification(NotificationTypes.error, error_msg)
             self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
