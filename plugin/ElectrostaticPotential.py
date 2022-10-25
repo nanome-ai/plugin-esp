@@ -31,7 +31,25 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
             self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
             return
         selected_comps = await self.request_complexes(selected)
+
+        if not self.validate_comp_is_protein(selected_comps):
+            self.send_notification(
+                NotificationTypes.error,
+                "Selected structure must contain a protein.")
+            self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
+            return False
         await self.run_process_and_upload_volume(selected_comps)
+
+    def validate_comp_is_protein(self, comp_list):
+        """Make sure selected complex contains a protein."""
+        valid = True
+        for comp in comp_list:
+            # atoms that are not hetatoms are considered a protein
+            protein_found = any(a.is_het is False for a in comp.atoms)
+            if not protein_found:
+                valid = False
+                break
+        return valid
 
     async def run_process_and_upload_volume(self, comp_list):
         target = comp_list[0]
