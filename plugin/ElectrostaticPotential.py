@@ -19,19 +19,40 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
     async def on_run(self):
         self.set_plugin_list_button(self.PluginListButtonType.run, "Running...", False)
         complex_list = await self.request_complex_list()
+        valid_selection = True
+        error_msg = ''
         selected = [c.index for c in complex_list if c.get_selected()]
-        if not selected:
-            self.send_notification(
-                NotificationTypes.error, "Please select a complex")
+        if not len(selected) == 1:
+            if not selected:
+                error_msg = 'Please select a complex.'
+            else:
+                error_msg = 'Please select only one complex'
+            valid_selection = False
+
+        # Only request complex data if valid selection was made
+        if valid_selection:
+            selected_comps = await self.request_complexes(selected)
+            if not self.validate_comp_is_protein(selected_comps):
+                error_msg = 'Selected complex must contain a protein'
+                valid_selection = False
+
+        if not valid_selection:
+            self.send_notification(NotificationTypes.error, error_msg)
             self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
             return
-        if len(selected) > 1:
-            self.send_notification(
-                NotificationTypes.error, "Please select only one complex")
-            self.set_plugin_list_button(self.PluginListButtonType.run, "Run", True)
-            return
-        selected_comps = await self.request_complexes(selected)
+
         await self.run_process_and_upload_volume(selected_comps)
+
+    def validate_comp_is_protein(self, comp_list):
+        """Make sure selected complex contains a protein."""
+        valid = True
+        for comp in comp_list:
+            # atoms that are not hetatoms are considered a protein
+            protein_found = any(a.is_het is False for a in comp.atoms)
+            if not protein_found:
+                valid = False
+                break
+        return valid
 
     async def run_process_and_upload_volume(self, comp_list):
         target = comp_list[0]
