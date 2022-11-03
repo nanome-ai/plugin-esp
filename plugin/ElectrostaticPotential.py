@@ -1,5 +1,5 @@
 import nanome
-from nanome.util import async_callback
+from nanome.util import async_callback, Logs
 from nanome.util.enums import Integrations, NotificationTypes, VolumeVisualStyle
 from nanome._internal._volumetric._volume_layer import _VolumeLayer
 from nanome._internal._volumetric._volume_properties import _VolumeProperties
@@ -13,7 +13,13 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
 
     @async_callback
     async def on_integration_request(self, request):
-        await self.run_process_and_upload_volume(request.get_args())
+        comp_list = request.get_args()
+        if not self.validate_comp_is_protein(comp_list):
+            error_msg = 'Selected complex must contain a protein'
+            self.send_notification(NotificationTypes.error, error_msg)
+            Logs.warning(error_msg)
+            return
+        await self.run_process_and_upload_volume(comp_list)
 
     @async_callback
     async def on_run(self):
