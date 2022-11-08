@@ -3,7 +3,7 @@ from nanome.util import async_callback, Logs
 from nanome.util.enums import Integrations, NotificationTypes, VolumeVisualStyle
 from nanome._internal._volumetric._volume_layer import _VolumeLayer
 from nanome._internal._volumetric._volume_properties import _VolumeProperties
-from . import process
+from . import process, __version__
 
 
 class ElectrostaticPotential(nanome.AsyncPluginInstance):
@@ -87,7 +87,14 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
 
 
 def main():
-    plugin = nanome.Plugin('Electrostatic Potential', 'Calculates Electrostatic Potential Map', 'ESP', False, integrations=[Integrations.calculate_esp])
+    plugin_name = 'Electrostatic Potential'
+    description = 'Calculates Electrostatic Potential Map'
+    tags = 'ESP'
+    has_advanced_menu = False
+    plugin = nanome.Plugin(
+        plugin_name, description, tags, has_advanced_menu,
+        integrations=[Integrations.calculate_esp],
+        version=__version__)
     plugin.set_plugin_class(ElectrostaticPotential)
     plugin.run()
 
