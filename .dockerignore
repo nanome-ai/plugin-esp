@@ -2,8 +2,8 @@
 **/__pycache__
 *
 !plugin
-!apbs-pdb2pqr.tgz
 !requirements.txt
 !run.py
 !run_tests.py
 !tests
+!APBS-3.4.1.Linux.zip

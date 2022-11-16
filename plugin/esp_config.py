@@ -39,5 +39,5 @@ quit
 
 pdb2pqr_config = {
     "path": os.getenv("PDB2PQR", "pdb2pqr"),
-    "args": ["--ff=AMBER", "--chain", "--drop-water"]
+    "args": ["--ff=AMBER", "--keep-chain", "--drop-water"]
 }
