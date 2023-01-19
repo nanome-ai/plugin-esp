@@ -1,2 +1,2 @@
-nanome==0.38.8
+nanome==0.38.10
 pdb2pqr==3.5.2
