@@ -1,7 +1,6 @@
 from nanome.util import Vector3
 from nanome.util.enums import VolumeType
-from nanome._internal._volumetric._unit_cell import _UnitCell
-from nanome._internal._volumetric._volume_data import _VolumeData
+from nanome._internal.volumetric.models import _UnitCell, _VolumeData
 
 """
 Example opendx file:

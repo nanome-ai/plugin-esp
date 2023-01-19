@@ -1,8 +1,8 @@
 import nanome
 from nanome.util import async_callback, Logs
 from nanome.util.enums import Integrations, NotificationTypes, VolumeVisualStyle
-from nanome._internal._volumetric._volume_layer import _VolumeLayer
-from nanome._internal._volumetric._volume_properties import _VolumeProperties
+from nanome._internal.volumetric.models import _VolumeLayer, _VolumeProperties
+
 from . import process, __version__
 
 
