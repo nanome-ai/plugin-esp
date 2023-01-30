@@ -1,6 +1,6 @@
 from nanome.util import Vector3
 from nanome.util.enums import VolumeType
-from nanome._internal.volumetric.models import _UnitCell, _VolumeData
+from nanome.api.volumetric.models import UnitCell, VolumeData
 
 """
 Example opendx file:
@@ -55,7 +55,7 @@ def parse_lines(lines):
     delta_z = float(delta_lines[2].split()[3])
     delta = [delta_x, delta_y, delta_z]
 
-    cell = _UnitCell()
+    cell = UnitCell()
     cell._A = (dim[0] - 1) * delta[0]
     cell._B = (dim[1] - 1) * delta[1]
     cell._C = (dim[2] - 1) * delta[2]
@@ -64,7 +64,7 @@ def parse_lines(lines):
     cell._Gamma = 90.0
     cell._Origin = Vector3(origin[0], origin[1], origin[2])
 
-    volume = _VolumeData()
+    volume = VolumeData()
     volume._width = dim[0]
     volume._height = dim[1]
     volume._depth = dim[2]

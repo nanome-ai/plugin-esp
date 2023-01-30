@@ -1,7 +1,7 @@
 import nanome
 from nanome.util import async_callback, Logs
 from nanome.util.enums import Integrations, NotificationTypes, VolumeVisualStyle
-from nanome._internal.volumetric.models import _VolumeLayer, _VolumeProperties
+from nanome.api.volumetric.models import VolumeLayer, VolumeProperties
 
 from . import process, __version__
 
@@ -71,15 +71,15 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
     def upload_esp(self, comp, result):
         esp_complex, esp_map = result
         esp_map._name = comp.name + '_ESP'
-        properties = _VolumeProperties()
+        properties = VolumeProperties()
         properties._boxed = False
         properties._style = VolumeVisualStyle.SmoothSurface
         properties._use_map_mover = False
         properties._visible = False
-        layer0 = _VolumeLayer()
+        layer0 = VolumeLayer()
         layer0._rmsd = -1
         layer0._color.set_color_rgb(0xDC, 0x14, 0x3C, 0xBE)
-        layer1 = _VolumeLayer()
+        layer1 = VolumeLayer()
         layer1._rmsd = 1
         layer1._color.set_color_rgb(0x2E, 0x37, 0xFE, 0xBE)
         properties._layers = [layer0, layer1]
