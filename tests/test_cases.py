@@ -61,4 +61,6 @@ class ESPTestCase(unittest.TestCase):
     async def validate_esp_run(self):
         """Run plugin.calculate_interactions with provided args and make sure lines are added to LineManager."""
         self.plugin_instance._network = MagicMock()
+        self.plugin_instance.add_volume = MagicMock()
         await self.plugin_instance.on_run()
+        self.plugin_instance.add_volume.assert_called_once()
