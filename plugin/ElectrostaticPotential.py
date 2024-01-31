@@ -88,7 +88,7 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
 
 def main():
     plugin_name = 'Electrostatic Potential'
-    description = 'Calculates Electrostatic Potential Map'
+    description = 'Calculates an Electrostatic Potential Surface map on selected protein or nucleic acid biopolymers'
     tags = 'ESP'
     has_advanced_menu = False
     plugin = nanome.Plugin(
