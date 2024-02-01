@@ -15,7 +15,7 @@ class ElectrostaticPotential(nanome.AsyncPluginInstance):
     async def on_integration_request(self, request):
         comp_list = request.get_args()
         if not self.validate_comp_is_protein(comp_list):
-            error_msg = 'Selected complex must contain a protein'
+            error_msg = 'Selected complex must contain a protein, DNA, or RNA'
             self.send_notification(NotificationTypes.error, error_msg)
             Logs.warning(error_msg)
             return
